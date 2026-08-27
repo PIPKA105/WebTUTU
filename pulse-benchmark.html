@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>PULSE — тест производительности твоего устройства</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=Manrope:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg: #0D1512;
+    --panel: #121D19;
+    --panel-2: #17251F;
+    --ink: #EAF2EC;
+    --muted: #7E9C90;
+    --muted-2: #4E6960;
+    --brass: #C9A15E;
+    --brass-dim: #8A6F42;
+    --cyan: #6FE7D8;
+    --coral: #FF6B4A;
+    --line: #24352E;
+    --radius: 14px;
+  }
+  *{ box-sizing:border-box; margin:0; padding:0; }
+  html{ scroll-behavior:smooth; }
+  body{
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'Manrope', sans-serif;
+    -webkit-font-smoothing: antialiased;
+    background-image:
+      radial-gradient(ellipse 900px 500px at 20% -10%, rgba(201,161,94,0.08), transparent 60%),
+      radial-gradient(ellipse 700px 500px at 100% 20%, rgba(111,231,216,0.05), transparent 60%);
+  }
+  .mono{ font-family:'IBM Plex Mono', monospace; }
+  .display{ font-family:'Space Grotesk', sans-serif; }
+  ::selection{ background: var(--brass); color:#0D1512; }
+  @media (prefers-reduced-motion: reduce){
+    .ecg path{ animation: none !important; }
+  }
+
+  .page{ max-width: 880px; margin:0 auto; padding: 28px 20px 80px; }
+
+  /* ticket */
+  .ticket{ border:1px solid var(--line); border-radius: var(--radius); background: var(--panel); padding: 18px 22px; }
+  .ticket-row{ display:flex; justify-content:space-between; align-items:baseline; flex-wrap:wrap; gap:8px; }
+  .ticket-brand{ font-size:12px; letter-spacing:.18em; text-transform:uppercase; color:var(--brass); font-weight:600; }
+  .ticket-id{ font-size:11px; color:var(--muted); }
+  .ticket-device{ display:block; margin-top:10px; font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(22px,5vw,30px); letter-spacing:-.01em; }
+  .ticket-sub{ margin-top:4px; font-size:13px; color:var(--muted); }
+
+  /* ecg signature line */
+  .ecg{ margin-top:14px; height:32px; overflow:hidden; }
+  .ecg svg{ width:200%; height:100%; }
+  .ecg path{
+    fill:none; stroke: var(--brass); stroke-width:1.6; opacity:.75;
+    stroke-dasharray: 900;
+    animation: ecgmove 3.4s linear infinite;
+  }
+  @keyframes ecgmove{ from{ transform:translateX(0);} to{ transform:translateX(-50%);} }
+
+  /* device info card */
+  .devcard{ margin-top:20px; border:1px solid var(--line); border-radius: var(--radius); background:var(--panel); overflow:hidden; }
+  .devcard-head{ padding:12px 18px; border-bottom:1px solid var(--line); font-size:11px; letter-spacing:.1em; text-transform:uppercase; color:var(--muted-2); }
+  .devgrid{ display:grid; grid-template-columns:1fr 1fr; gap:1px; background:var(--line); }
+  .devitem{ background:var(--panel); padding:12px 18px; }
+  .devitem dt{ font-size:10px; letter-spacing:.08em; text-transform:uppercase; color:var(--muted-2); margin-bottom:4px; }
+  .devitem dd{ font-size:13px; font-family:'IBM Plex Mono',monospace; word-break:break-word; }
+
+  /* start */
+  .startbox{ margin-top:24px; text-align:center; }
+  .btn{
+    appearance:none; border:1px solid var(--brass-dim); background:linear-gradient(180deg,#22331E,#17251F);
+    color:var(--ink); font-family:'Space Grotesk',sans-serif; font-weight:600; font-size:15px;
+    padding:14px 30px; border-radius:10px; cursor:pointer; letter-spacing:.02em;
+    transition: transform .15s ease, border-color .15s ease, background .15s ease;
+  }
+  .btn:hover{ border-color:var(--brass); transform: translateY(-1px); }
+  .btn:active{ transform: translateY(0); }
+  .btn:disabled{ opacity:.5; cursor:not-allowed; }
+  .btn.secondary{ background:transparent; border-color:var(--line); color:var(--muted); }
+  .btn.secondary:hover{ border-color:var(--muted-2); color:var(--ink); }
+  .hint{ margin-top:10px; font-size:12px; color:var(--muted-2); }
+
+  /* running state */
+  .runbox{ margin-top:28px; border:1px solid var(--line); border-radius:var(--radius); background:var(--panel); padding:22px; }
+  .stage-list{ display:flex; gap:8px; flex-wrap:wrap; margin-bottom:16px; }
+  .stage-pill{
+    font-size:11px; padding:6px 12px; border-radius:20px; border:1px solid var(--line); color:var(--muted-2);
+    font-family:'IBM Plex Mono',monospace; transition: all .3s ease;
+  }
+  .stage-pill.active{ border-color:var(--brass); color:var(--brass); background:rgba(201,161,94,.08); }
+  .stage-pill.done{ border-color:var(--cyan); color:var(--cyan); }
+  .overall-track{ height:8px; background:var(--line); border-radius:6px; overflow:hidden; margin-bottom:16px; }
+  .overall-fill{ height:100%; width:0%; background:linear-gradient(90deg,var(--brass-dim),var(--brass)); border-radius:6px; transition:width .25s ease; }
+  #gpuStageWrap{ display:none; margin-bottom:16px; text-align:center; }
+  #gpuCanvas{ background:#0A100D; border:1px solid var(--line); border-radius:8px; max-width:100%; }
+  .console{
+    background:#0A100D; border:1px solid var(--line); border-radius:8px; padding:12px 14px;
+    height:150px; overflow-y:auto; font-family:'IBM Plex Mono',monospace; font-size:12px; color:var(--cyan);
+    display:flex; flex-direction:column; gap:4px;
+  }
+  .console div{ opacity:.85; }
+  .console div.new{ opacity:0; animation: consoleIn .3s ease forwards; }
+  @keyframes consoleIn{ to{ opacity:.85; } }
+
+  /* results */
+  .results{ display:none; }
+  .hero{
+    margin-top:28px; border:1px solid var(--line); border-radius:var(--radius);
+    background:linear-gradient(180deg,var(--panel) 0%, var(--panel-2) 100%);
+    padding:40px 24px 32px; display:flex; flex-direction:column; align-items:center; text-align:center;
+  }
+  .gauge-wrap{ position:relative; width:min(320px,78vw); aspect-ratio:1; }
+  .gauge-wrap svg{ width:100%; height:100%; transform:rotate(-90deg); }
+  .gauge-track{ fill:none; stroke:var(--line); stroke-width:10; }
+  .gauge-fill{ fill:none; stroke:url(#gaugeGrad); stroke-width:10; stroke-linecap:round; stroke-dasharray:754; stroke-dashoffset:754; transition:stroke-dashoffset 1.6s cubic-bezier(.16,.84,.32,1); }
+  .gauge-center{ position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:4px; }
+  .gauge-score{ font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:clamp(34px,8vw,48px); letter-spacing:-.02em; }
+  .gauge-label{ font-size:11px; letter-spacing:.16em; text-transform:uppercase; color:var(--muted); }
+  .rank-badge{
+    margin-top:18px; display:inline-flex; align-items:center; gap:8px; padding:6px 16px; border-radius:20px;
+    border:1px solid var(--brass-dim); font-family:'Space Grotesk',sans-serif; font-weight:700; font-size:14px;
+  }
+  .rank-badge .letter{ font-size:18px; color:var(--brass); }
+  .scale-note{ margin-top:14px; font-size:11px; color:var(--muted-2); max-width:420px; }
+
+  .section-head{ display:flex; align-items:baseline; justify-content:space-between; margin:40px 0 16px; padding-bottom:10px; border-bottom:1px solid var(--line); }
+  .section-head h2{ font-family:'Space Grotesk',sans-serif; font-size:15px; letter-spacing:.1em; text-transform:uppercase; font-weight:600; }
+  .section-head span{ font-size:11px; color:var(--muted-2); }
+
+  .cat{ display:grid; grid-template-columns:110px 1fr 130px; align-items:center; gap:16px; padding:14px 4px; border-bottom:1px solid var(--line); }
+  .cat:last-child{ border-bottom:none; }
+  .cat-name{ font-size:13px; font-weight:600; }
+  .cat-name small{ display:block; font-size:10px; color:var(--muted-2); font-weight:400; margin-top:2px; }
+  .cat-bar{ height:8px; background:var(--line); border-radius:6px; overflow:hidden; }
+  .cat-bar i{ display:block; height:100%; width:0%; border-radius:6px; transition:width 1.2s cubic-bezier(.16,.84,.32,1); }
+  .cat-val{ text-align:right; font-family:'IBM Plex Mono',monospace; font-size:12.5px; color:var(--ink); }
+
+  footer{ margin-top:50px; padding-top:18px; border-top:1px solid var(--line); display:flex; justify-content:space-between; flex-wrap:wrap; gap:8px; font-size:11px; color:var(--muted-2); }
+
+  .actions{ margin-top:28px; text-align:center; }
+
+  @media (max-width:480px){
+    .devgrid{ grid-template-columns:1fr; }
+    .cat{ grid-template-columns:84px 1fr 100px; gap:10px; }
+  }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--cyan); outline-offset:2px; }
+</style>
+</head>
+<body>
+
+<div class="page">
+
+  <div class="ticket">
+    <div class="ticket-row">
+      <span class="ticket-brand mono">PULSE · Тест производительности</span>
+      <span class="ticket-id mono" id="ticketId">ID —</span>
+    </div>
+    <span class="ticket-device">Твоё устройство. Твой результат.</span>
+    <span class="ticket-sub">Тест запускается прямо в браузере и измеряет именно то железо, на котором ты сейчас сидишь</span>
+    <div class="ecg">
+      <svg viewBox="0 0 800 32" preserveAspectRatio="none">
+        <path d="M0,16 L60,16 L75,16 L85,4 L95,28 L105,16 L160,16 L175,16 L185,6 L195,26 L205,16 L400,16 L460,16 L475,4 L485,28 L495,16 L560,16 L575,16 L585,6 L595,26 L605,16 L800,16
+                 M800,16 L860,16 L875,16 L885,4 L895,28 L905,16 L960,16 L975,16 L985,6 L995,26 L1005,16 L1200,16 L1260,16 L1275,4 L1285,28 L1295,16 L1360,16 L1375,16 L1385,6 L1395,26 L1405,16 L1600,16"/>
+      </svg>
+    </div>
+  </div>
+
+  <div class="devcard">
+    <div class="devcard-head mono">Обнаружено автоматически</div>
+    <dl class="devgrid" id="devGrid"></dl>
+  </div>
+
+  <div class="startbox" id="startBox">
+    <button class="btn" id="startBtn">Запустить тест</button>
+    <p class="hint">Займёт около 6 секунд. Не переключай вкладку во время теста — это собьёт замер.</p>
+  </div>
+
+  <div class="runbox" id="runBox" style="display:none">
+    <div class="stage-list">
+      <span class="stage-pill mono" data-stage="cpu">CPU</span>
+      <span class="stage-pill mono" data-stage="gpu">GPU</span>
+      <span class="stage-pill mono" data-stage="mem">MEM</span>
+      <span class="stage-pill mono" data-stage="ux">UX</span>
+    </div>
+    <div class="overall-track"><div class="overall-fill" id="overallFill"></div></div>
+    <div id="gpuStageWrap">
+      <canvas id="gpuCanvas" width="420" height="200"></canvas>
+    </div>
+    <div class="console" id="console"></div>
+  </div>
+
+  <div class="results" id="results">
+    <div class="hero">
+      <div class="gauge-wrap">
+        <svg viewBox="0 0 260 260">
+          <defs>
+            <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stop-color="#8A6F42"/>
+              <stop offset="100%" stop-color="#C9A15E"/>
+            </linearGradient>
+          </defs>
+          <circle class="gauge-track" cx="130" cy="130" r="120"/>
+          <circle class="gauge-fill" id="gaugeFill" cx="130" cy="130" r="120"/>
+        </svg>
+        <div class="gauge-center">
+          <span class="gauge-score display" id="scoreNum">0</span>
+          <span class="gauge-label">PULSE Score</span>
+        </div>
+      </div>
+      <div class="rank-badge" id="rankBadge"><span class="letter">—</span><span id="rankText">—</span></div>
+      <p class="scale-note">Собственная шкала PULSE — результат считается только по данным твоего запуска, без сопоставления с внешними базами. Запусти ещё раз, чтобы сравнить с предыдущим результатом.</p>
+    </div>
+
+    <div class="section-head"><h2>Разбор по категориям</h2><span class="mono">4 замера</span></div>
+    <div class="cats">
+      <div class="cat">
+        <div class="cat-name">CPU<small>Вычисления</small></div>
+        <div class="cat-bar"><i id="barCpu" style="background:var(--brass)"></i></div>
+        <div class="cat-val" id="valCpu">—</div>
+      </div>
+      <div class="cat">
+        <div class="cat-name">GPU<small>Рендеринг</small></div>
+        <div class="cat-bar"><i id="barGpu" style="background:var(--coral)"></i></div>
+        <div class="cat-val" id="valGpu">—</div>
+      </div>
+      <div class="cat">
+        <div class="cat-name">MEM<small>Память</small></div>
+        <div class="cat-bar"><i id="barMem" style="background:var(--cyan)"></i></div>
+        <div class="cat-val" id="valMem">—</div>
+      </div>
+      <div class="cat">
+        <div class="cat-name">UX<small>Отклик DOM</small></div>
+        <div class="cat-bar"><i id="barUx" style="background:#9FB8AC"></i></div>
+        <div class="cat-val" id="valUx">—</div>
+      </div>
+    </div>
+
+    <div class="actions">
+      <button class="btn secondary" id="retryBtn">Повторить тест</button>
+    </div>
+  </div>
+
+  <footer>
+    <span class="mono">PULSE — локальный тест, ничего не отправляется на сервер</span>
+    <span class="mono" id="footTime">—</span>
+  </footer>
+
+</div>
+
+<script>
+(() => {
+  // ---------- device info detection ----------
+  function detectOS(ua){
+    if(/Windows/.test(ua)) return 'Windows';
+    if(/Android/.test(ua)) return 'Android';
+    if(/iPhone|iPad|iPod/.test(ua)) return 'iOS';
+    if(/Mac OS X/.test(ua)) return 'macOS';
+    if(/Linux/.test(ua)) return 'Linux';
+    return 'Неизвестно';
+  }
+  function detectBrowser(ua){
+    if(/Edg\//.test(ua)) return 'Edge';
+    if(/OPR\//.test(ua)) return 'Opera';
+    if(/Firefox\//.test(ua)) return 'Firefox';
+    if(/Chrome\//.test(ua) && !/Chromium/.test(ua)) return 'Chrome';
+    if(/Safari\//.test(ua) && !/Chrome/.test(ua)) return 'Safari';
+    return 'Неизвестно';
+  }
+  function detectGpu(){
+    try{
+      const c = document.createElement('canvas');
+      const gl = c.getContext('webgl') || c.getContext('experimental-webgl');
+      if(!gl) return 'н/д (WebGL недоступен)';
+      const ext = gl.getExtension('WEBGL_debug_renderer_info');
+      if(!ext) return 'н/д (браузер скрывает данные)';
+      return gl.getParameter(ext.UNMASKED_RENDERER_WEBGL) || 'н/д';
+    }catch(e){ return 'н/д'; }
+  }
+
+  const ua = navigator.userAgent;
+  const devInfo = [
+    ['ОС', detectOS(ua)],
+    ['Браузер', detectBrowser(ua)],
+    ['Логических ядер CPU', navigator.hardwareConcurrency ? navigator.hardwareConcurrency + ' шт.' : 'н/д'],
+    ['Память (прибл.)', navigator.deviceMemory ? navigator.deviceMemory + ' ГБ' : 'н/д (браузер не сообщает)'],
+    ['Экран', screen.width + '×' + screen.height + ' @' + (window.devicePixelRatio||1) + 'x'],
+    ['GPU (рендерер)', detectGpu()],
+    ['Сеть', (navigator.connection && navigator.connection.effectiveType) ? navigator.connection.effectiveType : 'н/д'],
+    ['Язык', navigator.language || 'н/д'],
+  ];
+  const grid = document.getElementById('devGrid');
+  devInfo.forEach(([k,v]) => {
+    const wrap = document.createElement('div');
+    wrap.className = 'devitem';
+    wrap.innerHTML = `<dt>${k}</dt><dd>${v}</dd>`;
+    grid.appendChild(wrap);
+  });
+
+  document.getElementById('ticketId').textContent =
+    'ID ' + Math.random().toString(36).slice(2,8).toUpperCase();
+
+  // ---------- helpers ----------
+  const sleep = ms => new Promise(r => setTimeout(r, ms));
+  const consoleEl = document.getElementById('console');
+  function log(msg){
+    const line = document.createElement('div');
+    line.className = 'new';
+    line.textContent = '› ' + msg;
+    consoleEl.appendChild(line);
+    consoleEl.scrollTop = consoleEl.scrollHeight;
+  }
+  function setStage(name, state){
+    const pill = document.querySelector(`.stage-pill[data-stage="${name}"]`);
+    pill.classList.remove('active','done');
+    if(state) pill.classList.add(state);
+  }
+  function setOverall(pct){
+    document.getElementById('overallFill').style.width = Math.min(100, pct) + '%';
+  }
+
+  // runs workUnit repeatedly until totalMs of actual work has elapsed,
+  // yielding to the browser between short slices so the UI stays responsive
+  async function runTimedTest(totalMs, sliceMs, workUnit, onProgress){
+    let ops = 0, elapsed = 0;
+    while(elapsed < totalMs){
+      const sliceStart = performance.now();
+      const sliceDeadline = sliceStart + sliceMs;
+      while(performance.now() < sliceDeadline){
+        workUnit();
+        ops++;
+      }
+      elapsed += performance.now() - sliceStart;
+      if(onProgress) onProgress(Math.min(1, elapsed/totalMs));
+      await sleep(0);
+    }
+    return { ops, elapsed };
+  }
+
+  function runGpuTest(durationMs){
+    return new Promise(resolve => {
+      const canvas = document.getElementById('gpuCanvas');
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width, h = canvas.height;
+      let frames = 0;
+      const start = performance.now();
+      function frame(now){
+        frames++;
+        ctx.clearRect(0,0,w,h);
+        const t = now/450;
+        for(let i=0;i<140;i++){
+          const angle = t + i*0.31;
+          const x = w/2 + Math.cos(angle+i)*(70+(i%5)*14);
+          const y = h/2 + Math.sin(angle*1.3+i)*(50+(i%7)*10);
+          ctx.fillStyle = `hsl(${(i*7+t*50)%360},70%,60%)`;
+          ctx.beginPath();
+          ctx.arc(x,y,3+(i%4),0,Math.PI*2);
+          ctx.fill();
+        }
+        const elapsed = now - start;
+        setOverall(20 + (elapsed/durationMs)*20);
+        if(elapsed < durationMs){
+          requestAnimationFrame(frame);
+        } else {
+          resolve({ frames, elapsed });
+        }
+      }
+      requestAnimationFrame(frame);
+    });
+  }
+
+  // ---------- workloads ----------
+  let cpuSink = 0;
+  function cpuWorkUnit(){
+    let x = 0;
+    for(let i=0;i<400;i++){ x += Math.sqrt(i+1)*Math.sin(i) - Math.cos(i*0.5); }
+    cpuSink += x;
+  }
+
+  const MEM_SIZE = 200000; // floats per buffer
+  const bufA = new Float64Array(MEM_SIZE);
+  const bufB = new Float64Array(MEM_SIZE);
+  for(let i=0;i<MEM_SIZE;i++) bufA[i] = Math.random();
+  let memSink = 0;
+  function memWorkUnit(){
+    bufB.set(bufA);
+    memSink += bufB[0] + bufB[MEM_SIZE-1];
+  }
+
+  const uxContainer = document.createElement('div');
+  uxContainer.style.cssText = 'position:absolute;top:-9999px;left:-9999px;width:100px;';
+  document.body.appendChild(uxContainer);
+  function uxWorkUnit(){
+    const el = document.createElement('div');
+    el.textContent = 'x';
+    el.style.transform = 'translateY(' + (Math.random()*10) + 'px)';
+    uxContainer.appendChild(el);
+    void el.offsetHeight;
+    uxContainer.removeChild(el);
+  }
+
+  // ---------- scoring (PULSE's own scale, not tied to any external db) ----------
+  function computeScores({cpuOps, avgFps, memMBs, uxOpsPerSec}){
+    const cpuScore = Math.round(cpuOps * 9);
+    const gpuScore = Math.round(avgFps * 4200);
+    const memScore = Math.round(memMBs * 850);
+    const uxScore  = Math.round(uxOpsPerSec * 70);
+    const total = cpuScore + gpuScore + memScore + uxScore;
+    return { cpuScore, gpuScore, memScore, uxScore, total };
+  }
+
+  function rankFor(total){
+    if(total >= 800000) return {letter:'S', text:'Топовый уровень'};
+    if(total >= 500000) return {letter:'A', text:'Высокий уровень'};
+    if(total >= 300000) return {letter:'B', text:'Средний уровень'};
+    if(total >= 150000) return {letter:'C', text:'Базовый уровень'};
+    return {letter:'D', text:'Начальный уровень'};
+  }
+
+  function animateCount(el, target, duration){
+    const start = performance.now();
+    function step(now){
+      const p = Math.min(1, (now-start)/duration);
+      const eased = 1 - Math.pow(1-p, 3);
+      el.textContent = Math.round(target*eased).toLocaleString('ru-RU');
+      if(p < 1) requestAnimationFrame(step);
+    }
+    requestAnimationFrame(step);
+  }
+
+  // ---------- orchestration ----------
+  async function startBenchmark(){
+    document.getElementById('startBox').style.display = 'none';
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('runBox').style.display = 'block';
+    consoleEl.innerHTML = '';
+    setOverall(0);
+    ['cpu','gpu','mem','ux'].forEach(s => setStage(s, null));
+
+    log('Инициализация теста…');
+    await sleep(250);
+
+    setStage('cpu','active');
+    log('CPU: вычисление с плавающей точкой…');
+    const cpuRes = await runTimedTest(1100, 40, cpuWorkUnit, p => setOverall(p*20));
+    setStage('cpu','done');
+    log(`CPU готов — ${cpuRes.ops.toLocaleString('ru-RU')} операций`);
+
+    setStage('gpu','active');
+    document.getElementById('gpuStageWrap').style.display = 'block';
+    log('GPU: рендеринг сцены на canvas…');
+    const gpuRes = await runGpuTest(1400);
+    const avgFps = gpuRes.frames / (gpuRes.elapsed/1000);
+    document.getElementById('gpuStageWrap').style.display = 'none';
+    setStage('gpu','done');
+    log(`GPU готов — ${avgFps.toFixed(1)} кадров/с в среднем`);
+
+    setStage('mem','active');
+    log('Память: копирование буферов…');
+    const memRes = await runTimedTest(900, 40, memWorkUnit, p => setOverall(40 + p*20));
+    const memMBs = (memRes.ops * MEM_SIZE * 8 / 1024 / 1024) / (memRes.elapsed/1000);
+    setStage('mem','done');
+    log(`Память готова — ${memMBs.toFixed(0)} МБ/с`);
+
+    setStage('ux','active');
+    log('UX: манипуляции DOM…');
+    const uxRes = await runTimedTest(800, 40, uxWorkUnit, p => setOverall(60 + p*20));
+    const uxOpsPerSec = uxRes.ops / (uxRes.elapsed/1000);
+    setStage('ux','done');
+    log(`UX готов — ${uxOpsPerSec.toFixed(0)} операций/с`);
+
+    setOverall(90);
+    log('Подсчёт итогового результата…');
+    await sleep(350);
+    setOverall(100);
+
+    const scores = computeScores({ cpuOps: cpuRes.ops, avgFps, memMBs, uxOpsPerSec });
+    showResults(scores, { cpuRes, avgFps, memMBs, uxOpsPerSec });
+  }
+
+  function showResults(scores, raw){
+    document.getElementById('runBox').style.display = 'none';
+    document.getElementById('results').style.display = 'block';
+
+    const TOTAL_MAX = 1200000;
+    const CIRC = 754;
+    const fill = document.getElementById('gaugeFill');
+    const pct = Math.min(1, scores.total / TOTAL_MAX);
+    requestAnimationFrame(() => {
+      fill.style.strokeDashoffset = CIRC - pct * CIRC;
+    });
+    animateCount(document.getElementById('scoreNum'), scores.total, 1400);
+
+    const rank = rankFor(scores.total);
+    document.querySelector('#rankBadge .letter').textContent = rank.letter;
+    document.getElementById('rankText').textContent = rank.text;
+
+    const catMax = { cpu: 300000, gpu: 350000, mem: 300000, ux: 150000 };
+    function setBar(id, valueId, score, max, label){
+      document.getElementById(id).style.width = Math.min(100, (score/max)*100) + '%';
+      animateCount(document.getElementById(valueId), score, 1200);
+    }
+    setBar('barCpu','valCpu', scores.cpuScore, catMax.cpu);
+    setBar('barGpu','valGpu', scores.gpuScore, catMax.gpu);
+    setBar('barMem','valMem', scores.memScore, catMax.mem);
+    setBar('barUx','valUx', scores.uxScore, catMax.ux);
+
+    document.getElementById('footTime').textContent =
+      'Тест завершён: ' + new Date().toLocaleString('ru-RU');
+  }
+
+  document.getElementById('startBtn').addEventListener('click', startBenchmark);
+  document.getElementById('retryBtn').addEventListener('click', () => {
+    document.getElementById('results').style.display = 'none';
+    document.getElementById('startBox').style.display = 'block';
+  });
+})();
+</script>
+
+</body>
+</html>
