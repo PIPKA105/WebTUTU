@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>WebTuTu Benchmark</title>
+
+<style>
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    min-height: 100vh;
+    background: #080b12;
+    color: white;
+    font-family: Arial, sans-serif;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.app {
+    width: 100%;
+    max-width: 500px;
+    min-height: 100vh;
+    padding: 25px 18px;
+    display: flex;
+    flex-direction: column;
+}
+
+.logo {
+    text-align: center;
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    margin-top: 20px;
+}
+
+.logo span {
+    color: #00e5ff;
+}
+
+.subtitle {
+    text-align: center;
+    color: #7f8999;
+    margin-top: 8px;
+}
+
+.scoreBox {
+    margin: 45px auto 30px;
+    width: 220px;
+    height: 220px;
+    border-radius: 50%;
+    border: 8px solid #151b27;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    position: relative;
+}
+
+.score {
+    text-align: center;
+}
+
+.scoreNumber {
+    font-size: 54px;
+    font-weight: 900;
+}
+
+.scoreText {
+    color: #8791a1;
+    font-size: 14px;
+}
+
+.currentTest {
+    text-align: center;
+    margin: 15px 0;
+    font-size: 18px;
+}
+
+.progress {
+    width: 100%;
+    height: 10px;
+    background: #151b27;
+    border-radius: 10px;
+    overflow: hidden;
+    margin-bottom: 25px;
+}
+
+.progressBar {
+    height: 100%;
+    width: 0%;
+    background: linear-gradient(90deg, #00e5ff, #5865ff);
+    transition: width .3s;
+}
+
+button {
+    border: none;
+    width: 100%;
+    padding: 19px;
+    border-radius: 15px;
+    background: linear-gradient(135deg, #00d9ff, #4c62ff);
+    color: white;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    box-shadow: 0 8px 30px rgba(0, 180, 255, .2);
+}
+
+button:active {
+    transform: scale(.98);
+}
+
+button:disabled {
+    opacity: .5;
+}
+
+.results {
+    margin-top: 30px;
+}
+
+.result {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: #10151f;
+    padding: 17px;
+    border-radius: 13px;
+    margin-bottom: 9px;
+}
+
+.resultName {
+    font-weight: bold;
+}
+
+.resultDesc {
+    color: #687386;
+    font-size: 12px;
+    margin-top: 4px;
+}
+
+.resultScore {
+    font-size: 21px;
+    font-weight: bold;
+    color: #00e5ff;
+}
+
+.hidden {
+    display: none;
+}
+
+.device {
+    text-align: center;
+    color: #667084;
+    margin-top: auto;
+    padding-top: 30px;
+    font-size: 12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+    <div class="logo">
+        WEB<span>TUTU</span>
+    </div>
+
+    <div class="subtitle">
+        Browser Performance Benchmark
+    </div>
+
+    <div class="scoreBox">
+        <div class="score">
+            <div class="scoreNumber" id="totalScore">--</div>
+            <div class="scoreText">ИТОГ / 10</div>
+        </div>
+    </div>
+
+    <div class="currentTest" id="currentTest">
+        Готов к тестированию
+    </div>
+
+    <div class="progress">
+        <div class="progressBar" id="progressBar"></div>
+    </div>
+
+    <button id="startButton" onclick="startBenchmark()">
+        НАЧАТЬ ТЕСТ
+    </button>
+
+    <div class="results hidden" id="results">
+
+        <div class="result">
+            <div>
+                <div class="resultName">CPU</div>
+                <div class="resultDesc">JavaScript вычисления</div>
+            </div>
+            <div class="resultScore" id="cpuScore">--</div>
+        </div>
+
+        <div class="result">
+            <div>
+                <div class="resultName">GPU</div>
+                <div class="resultDesc">WebGL рендеринг</div>
+            </div>
+            <div class="resultScore" id="gpuScore">--</div>
+        </div>
+
+        <div class="result">
+            <div>
+                <div class="resultName">RAM</div>
+                <div class="resultDesc">Операции с памятью</div>
+            </div>
+            <div class="resultScore" id="ramScore">--</div>
+        </div>
+
+        <div class="result">
+            <div>
+                <div class="resultName">JS</div>
+                <div class="resultDesc">Производительность браузера</div>
+            </div>
+            <div class="resultScore" id="jsScore">--</div>
+        </div>
+
+        <div class="result">
+            <div>
+                <div class="resultName">DEVICE</div>
+                <div class="resultDesc">Общая производительность</div>
+            </div>
+            <div class="resultScore" id="deviceScore">--</div>
+        </div>
+
+    </div>
+
+    <div class="device" id="deviceInfo">
+        Подготовка информации об устройстве...
+    </div>
+
+</div>
+
+<script>
+
+const currentTest = document.getElementById("currentTest");
+const progressBar = document.getElementById("progressBar");
+const totalScore = document.getElementById("totalScore");
+const startButton = document.getElementById("startButton");
+
+document.getElementById("deviceInfo").innerText =
+    navigator.userAgent;
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function score(value, min, max) {
+    let s = (value - min) / (max - min) * 10;
+    return Math.max(1, Math.min(10, s));
+}
+
+/* ================= CPU TEST ================= */
+
+async function cpuTest() {
+
+    currentTest.innerText = "Тест CPU...";
+
+    const start = performance.now();
+
+    let x = 0;
+
+    for (let i = 0; i < 15000000; i++) {
+        x += Math.sqrt(i) * Math.sin(i);
+    }
+
+    const time = performance.now() - start;
+
+    /*
+       Чем меньше время — тем лучше.
+       Пороговые значения можно менять.
+    */
+
+    let result =
+        10 - ((time - 100) / 900) * 9;
+
+    result = Math.max(1, Math.min(10, result));
+
+    document.getElementById("cpuScore").innerText =
+        result.toFixed(1);
+
+    return result;
+}
+
+
+/* ================= JS TEST ================= */
+
+async function jsTest() {
+
+    currentTest.innerText = "Тест JavaScript...";
+
+    const start = performance.now();
+
+    let array = [];
+
+    for (let i = 0; i < 1000000; i++) {
+        array.push({
+            id: i,
+            value: Math.random() * i
+        });
+    }
+
+    array.sort((a, b) => a.value - b.value);
+
+    let sum = 0;
+
+    for (let i = 0; i < array.length; i++) {
+        sum += array[i].value;
+    }
+
+    const time = performance.now() - start;
+
+    let result =
+        10 - ((time - 100) / 1500) * 9;
+
+    result = Math.max(1, Math.min(10, result));
+
+    document.getElementById("jsScore").innerText =
+        result.toFixed(1);
+
+    return result;
+}
+
+
+/* ================= RAM TEST ================= */
+
+async function ramTest() {
+
+    currentTest.innerText = "Тест RAM...";
+
+    const start = performance.now();
+
+    const arrays = [];
+
+    for (let j = 0; j < 30; j++) {
+
+        const arr = new Float64Array(250000);
+
+        for (let i = 0; i < arr.length; i++) {
+            arr[i] = Math.random();
+        }
+
+        arrays.push(arr);
+    }
+
+    let total = 0;
+
+    for (const arr of arrays) {
+        for (let i = 0; i < arr.length; i += 10) {
+            total += arr[i];
+        }
+    }
+
+    const time = performance.now() - start;
+
+    let result =
+        10 - ((time - 50) / 1200) * 9;
+
+    result = Math.max(1, Math.min(10, result));
+
+    document.getElementById("ramScore").innerText =
+        result.toFixed(1);
+
+    return result;
+}
+
+
+/* ================= GPU TEST ================= */
+
+async function gpuTest() {
+
+    currentTest.innerText = "Тест GPU / WebGL...";
+
+    const canvas = document.createElement("canvas");
+
+    canvas.width = 800;
+    canvas.height = 600;
+
+    canvas.style.position = "fixed";
+    canvas.style.left = "-9999px";
+
+    document.body.appendChild(canvas);
+
+    const gl =
+        canvas.getContext("webgl") ||
+        canvas.getContext("experimental-webgl");
+
+    if (!gl) {
+
+        document.getElementById("gpuScore").innerText =
+            "N/A";
+
+        return 5;
+    }
+
+    const start = performance.now();
+
+    let frames = 0;
+
+    function render() {
+
+        gl.clearColor(
+            Math.random(),
+            Math.random(),
+            Math.random(),
+            1
+        );
+
+        gl.clear(gl.COLOR_BUFFER_BIT);
+
+        frames++;
+
+        if (performance.now() - start < 3000) {
+            requestAnimationFrame(render);
+        }
+    }
+
+    render();
+
+    await sleep(3200);
+
+    const fps = frames / 3;
+
+    /*
+       Примерная браузерная шкала.
+    */
+
+    let result =
+        score(fps, 20, 240);
+
+    document.getElementById("gpuScore").innerText =
+        result.toFixed(1);
+
+    canvas.remove();
+
+    return result;
+}
+
+
+/* ================= MAIN ================= */
+
+async function startBenchmark() {
+
+    startButton.disabled = true;
+    startButton.innerText = "ТЕСТИРОВАНИЕ...";
+
+    document.getElementById("results")
+        .classList.remove("hidden");
+
+    totalScore.innerText = "...";
+
+    progressBar.style.width = "5%";
+
+    const cpu = await cpuTest();
+
+    progressBar.style.width = "25%";
+
+    await sleep(500);
+
+    const gpu = await gpuTest();
+
+    progressBar.style.width = "50%";
+
+    await sleep(500);
+
+    const ram = await ramTest();
+
+    progressBar.style.width = "75%";
+
+    await sleep(500);
+
+    const js = await jsTest();
+
+    progressBar.style.width = "95%";
+
+    currentTest.innerText = "Расчёт результата...";
+
+    await sleep(1000);
+
+    /*
+       Итоговая оценка.
+
+       CPU = 35%
+       GPU = 30%
+       RAM = 20%
+       JS  = 15%
+    */
+
+    const finalScore =
+        cpu * 0.35 +
+        gpu * 0.30 +
+        ram * 0.20 +
+        js * 0.15;
+
+    const final =
+        Math.round(finalScore * 10) / 10;
+
+    document.getElementById("deviceScore")
+        .innerText = final.toFixed(1);
+
+    totalScore.innerText =
+        final.toFixed(1);
+
+    progressBar.style.width = "100%";
+
+    currentTest.innerText =
+        "Тест завершён";
+
+    startButton.disabled = false;
+    startButton.innerText =
+        "ПОВТОРИТЬ ТЕСТ";
+
+}
+
+</script>
+
+</body>
+</html>
