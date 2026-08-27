@@ -2,297 +2,225 @@
 <html lang="ru">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
 <title>WebTUTU Benchmark</title>
 
 <style>
 * {
     box-sizing: border-box;
-    margin: 0;
-    padding: 0;
-}
-
-:root {
-    --bg: #070a10;
-    --card: #10151e;
-    --card2: #151b26;
-    --text: #ffffff;
-    --muted: #788396;
-    --cyan: #00e5ff;
-    --blue: #5068ff;
-    --green: #00e676;
 }
 
 body {
+    margin: 0;
     min-height: 100vh;
-    background:
-        radial-gradient(circle at 50% 0%, #142238 0%, #070a10 45%);
-    color: var(--text);
-    font-family: Arial, Helvetica, sans-serif;
-    overflow-x: hidden;
+    background: #070a10;
+    color: white;
+    font-family: Arial, sans-serif;
 }
 
 .app {
     width: 100%;
     max-width: 520px;
-    min-height: 100vh;
     margin: auto;
-    padding: 22px 17px 30px;
+    padding: 25px 18px;
 }
-
-/* LOGO */
 
 .logo {
     text-align: center;
-    font-size: 31px;
+    font-size: 32px;
     font-weight: 900;
     letter-spacing: 2px;
     margin-top: 10px;
 }
 
 .logo span {
-    color: var(--cyan);
+    color: #00e5ff;
 }
 
 .subtitle {
     text-align: center;
-    color: var(--muted);
+    color: #758094;
+    margin-top: 8px;
     font-size: 13px;
-    margin-top: 7px;
 }
 
-/* SCORE */
-
-.score-container {
-    display: flex;
-    justify-content: center;
-    margin: 38px auto 25px;
-}
-
-.score-ring {
+.scoreBox {
     width: 230px;
     height: 230px;
+    margin: 40px auto 25px;
     border-radius: 50%;
     padding: 8px;
     background: conic-gradient(
-        var(--cyan) 0deg,
-        var(--blue) 0deg,
-        #18202c 0deg
+        #00e5ff 0deg,
+        #5068ff 0deg,
+        #1a202c 0deg
     );
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    box-shadow:
-        0 0 45px rgba(0, 229, 255, 0.10);
-    transition: background 0.5s ease;
 }
 
-.score-inner {
+.scoreInner {
     width: 100%;
     height: 100%;
     border-radius: 50%;
     background: #090d14;
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
 }
 
-.score-content {
+.score {
     text-align: center;
 }
 
-.score-number {
-    font-size: 43px;
+.scoreNumber {
+    font-size: 42px;
     font-weight: 900;
-    letter-spacing: -1px;
 }
 
-.score-max {
-    margin-top: 4px;
+.scoreMax {
+    color: #758094;
     font-size: 13px;
-    color: var(--muted);
-}
-
-/* CURRENT TEST */
-
-.current-test {
-    text-align: center;
-    font-size: 17px;
-    font-weight: bold;
-    min-height: 23px;
-}
-
-.test-description {
-    text-align: center;
-    color: var(--muted);
-    font-size: 12px;
-    min-height: 18px;
     margin-top: 5px;
 }
 
-/* PROGRESS */
+.current {
+    text-align: center;
+    font-size: 18px;
+    font-weight: bold;
+    min-height: 24px;
+}
 
-.progress-container {
-    margin-top: 20px;
+.description {
+    text-align: center;
+    color: #758094;
+    font-size: 12px;
+    margin-top: 5px;
+    min-height: 18px;
 }
 
 .progress {
-    width: 100%;
     height: 9px;
     background: #171d28;
     border-radius: 20px;
     overflow: hidden;
+    margin-top: 20px;
 }
 
-.progress-bar {
+.progressBar {
     width: 0%;
     height: 100%;
     background: linear-gradient(
         90deg,
-        var(--cyan),
-        var(--blue)
+        #00e5ff,
+        #5068ff
     );
-    border-radius: 20px;
-    transition: width 0.25s ease;
+    transition: width .2s;
 }
 
-.progress-text {
+.progressText {
     text-align: center;
-    color: var(--muted);
+    color: #667185;
     font-size: 11px;
     margin-top: 7px;
 }
 
-/* BUTTON */
-
-.start-button {
+button {
     width: 100%;
-    margin-top: 25px;
-    padding: 19px 15px;
     border: 0;
     border-radius: 15px;
-    color: white;
+    padding: 19px;
+    margin-top: 25px;
     background: linear-gradient(
         135deg,
         #00cfee,
         #5263ff
     );
+    color: white;
     font-size: 17px;
     font-weight: 900;
-    letter-spacing: 0.5px;
-    cursor: pointer;
-    box-shadow:
-        0 10px 30px rgba(0, 170, 255, 0.18);
-    transition: transform 0.15s ease, opacity 0.2s;
 }
 
-.start-button:active {
-    transform: scale(0.98);
+button:disabled {
+    opacity: .5;
 }
-
-.start-button:disabled {
-    opacity: 0.55;
-    cursor: not-allowed;
-}
-
-/* RESULTS */
 
 .results {
     margin-top: 28px;
 }
 
-.result-card {
+.card {
     display: flex;
     align-items: center;
     justify-content: space-between;
-    padding: 15px;
-    background: var(--card);
-    border: 1px solid #1a222f;
+    background: #10151e;
+    border: 1px solid #1b2330;
     border-radius: 14px;
+    padding: 15px;
     margin-bottom: 9px;
 }
 
-.result-left {
+.left {
     display: flex;
     align-items: center;
-    gap: 13px;
+    gap: 12px;
 }
 
-.result-icon {
+.icon {
     width: 40px;
     height: 40px;
+    background: #161d28;
     border-radius: 11px;
-    background: var(--card2);
     display: flex;
-    align-items: center;
     justify-content: center;
+    align-items: center;
     font-size: 19px;
 }
 
-.result-name {
-    font-size: 15px;
+.name {
     font-weight: bold;
 }
 
-.result-description {
-    color: var(--muted);
+.desc {
+    color: #687386;
     font-size: 11px;
-    margin-top: 3px;
+    margin-top: 4px;
 }
 
-.result-score {
-    font-size: 19px;
+.points {
+    color: #00e5ff;
+    font-size: 18px;
     font-weight: 900;
-    color: var(--cyan);
 }
-
-/* INFO */
 
 .info {
     margin-top: 20px;
     padding: 14px;
+    border-radius: 12px;
     background: #0d121a;
-    border-radius: 13px;
-    color: var(--muted);
+    color: #697487;
     font-size: 11px;
     line-height: 1.5;
 }
 
-.info strong {
-    color: #b9c3d3;
-}
-
-/* DEVICE */
-
-.device-info {
-    margin-top: 18px;
-    text-align: center;
-    color: #515c6d;
-    font-size: 10px;
-    line-height: 1.5;
-}
-
-/* HIDDEN */
-
-.hidden {
+.error {
+    margin-top: 15px;
+    padding: 12px;
+    border-radius: 10px;
+    background: #351319;
+    color: #ff8794;
+    font-size: 12px;
     display: none;
 }
 
-/* ANIMATION */
-
-.testing {
-    animation: pulse 1.2s infinite;
+.device {
+    text-align: center;
+    color: #4e596a;
+    font-size: 10px;
+    margin-top: 18px;
 }
 
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.55;
-    }
+.hidden {
+    display: none;
 }
 </style>
 </head>
@@ -309,25 +237,18 @@ body {
         Browser Performance Benchmark
     </div>
 
+    <div class="scoreBox" id="scoreBox">
 
-    <!-- SCORE -->
+        <div class="scoreInner">
 
-    <div class="score-container">
+            <div class="score">
 
-        <div class="score-ring" id="scoreRing">
+                <div class="scoreNumber" id="total">
+                    --
+                </div>
 
-            <div class="score-inner">
-
-                <div class="score-content">
-
-                    <div class="score-number" id="totalScore">
-                        --
-                    </div>
-
-                    <div class="score-max">
-                        / 100 000
-                    </div>
-
+                <div class="scoreMax">
+                    / 100 000
                 </div>
 
             </div>
@@ -336,227 +257,140 @@ body {
 
     </div>
 
-
-    <!-- CURRENT TEST -->
-
-    <div class="current-test" id="currentTest">
+    <div class="current" id="current">
         Готов к тестированию
     </div>
 
-    <div class="test-description" id="testDescription">
+    <div class="description" id="description">
         Нажми кнопку, чтобы начать
     </div>
 
+    <div class="progress">
 
-    <!-- PROGRESS -->
-
-    <div class="progress-container">
-
-        <div class="progress">
-
-            <div
-                class="progress-bar"
-                id="progressBar">
-            </div>
-
-        </div>
-
-        <div class="progress-text" id="progressText">
-            0%
+        <div
+            class="progressBar"
+            id="progressBar">
         </div>
 
     </div>
 
+    <div class="progressText" id="progressText">
+        0%
+    </div>
 
-    <!-- BUTTON -->
-
-    <button
-        class="start-button"
-        id="startButton"
-        onclick="startBenchmark()">
-
+    <button id="start">
         НАЧАТЬ ТЕСТ
-
     </button>
 
+    <div class="error" id="error"></div>
 
-    <!-- RESULTS -->
+    <div class="results">
 
-    <div
-        class="results hidden"
-        id="results">
+        <div class="card">
 
+            <div class="left">
 
-        <!-- CPU -->
-
-        <div class="result-card">
-
-            <div class="result-left">
-
-                <div class="result-icon">
-                    🧠
-                </div>
+                <div class="icon">🧠</div>
 
                 <div>
-
-                    <div class="result-name">
-                        CPU
-                    </div>
-
-                    <div class="result-description">
+                    <div class="name">CPU</div>
+                    <div class="desc">
                         Вычисления процессора
                     </div>
-
                 </div>
 
             </div>
 
-            <div
-                class="result-score"
-                id="cpuScore">
-
+            <div class="points" id="cpu">
                 --
-
             </div>
 
         </div>
 
 
-        <!-- GPU -->
+        <div class="card">
 
-        <div class="result-card">
+            <div class="left">
 
-            <div class="result-left">
-
-                <div class="result-icon">
-                    🎮
-                </div>
+                <div class="icon">🎮</div>
 
                 <div>
-
-                    <div class="result-name">
-                        GPU
+                    <div class="name">GPU</div>
+                    <div class="desc">
+                        Графический тест
                     </div>
-
-                    <div class="result-description">
-                        WebGL / 3D нагрузка
-                    </div>
-
                 </div>
 
             </div>
 
-            <div
-                class="result-score"
-                id="gpuScore">
-
+            <div class="points" id="gpu">
                 --
-
             </div>
 
         </div>
 
 
-        <!-- RAM -->
+        <div class="card">
 
-        <div class="result-card">
+            <div class="left">
 
-            <div class="result-left">
-
-                <div class="result-icon">
-                    💾
-                </div>
+                <div class="icon">💾</div>
 
                 <div>
-
-                    <div class="result-name">
-                        RAM
+                    <div class="name">RAM</div>
+                    <div class="desc">
+                        Память
                     </div>
-
-                    <div class="result-description">
-                        Операции с памятью
-                    </div>
-
                 </div>
 
             </div>
 
-            <div
-                class="result-score"
-                id="ramScore">
-
+            <div class="points" id="ram">
                 --
-
             </div>
 
         </div>
 
 
-        <!-- JS -->
+        <div class="card">
 
-        <div class="result-card">
+            <div class="left">
 
-            <div class="result-left">
-
-                <div class="result-icon">
-                    ⚙️
-                </div>
+                <div class="icon">⚙️</div>
 
                 <div>
-
-                    <div class="result-name">
-                        JS / UX
+                    <div class="name">JavaScript</div>
+                    <div class="desc">
+                        Работа JS
                     </div>
-
-                    <div class="result-description">
-                        Работа JavaScript
-                    </div>
-
                 </div>
 
             </div>
 
-            <div
-                class="result-score"
-                id="jsScore">
-
+            <div class="points" id="js">
                 --
-
             </div>
 
         </div>
 
 
-        <!-- FINAL -->
+        <div class="card">
 
-        <div class="result-card">
+            <div class="left">
 
-            <div class="result-left">
-
-                <div class="result-icon">
-                    🏆
-                </div>
+                <div class="icon">🏆</div>
 
                 <div>
-
-                    <div class="result-name">
-                        ИТОГ
-                    </div>
-
-                    <div class="result-description">
+                    <div class="name">ИТОГ</div>
+                    <div class="desc">
                         Общий результат
                     </div>
-
                 </div>
 
             </div>
 
-            <div
-                class="result-score"
-                id="finalScore">
-
+            <div class="points" id="final">
                 --
-
             </div>
 
         </div>
@@ -564,28 +398,14 @@ body {
     </div>
 
 
-    <!-- INFO -->
-
     <div class="info">
-
-        <strong>Важно:</strong><br>
-
-        WebTUTU измеряет производительность устройства
-        средствами браузера. Результаты зависят от браузера,
-        температуры устройства, фоновых процессов и режима
-        энергосбережения.
-
+        WebTUTU использует возможности браузера.
+        Результат зависит от температуры телефона,
+        браузера, энергосбережения и фоновых процессов.
     </div>
 
-
-    <!-- DEVICE INFO -->
-
-    <div
-        class="device-info"
-        id="deviceInfo">
-
+    <div class="device" id="device">
         Определение устройства...
-
     </div>
 
 </div>
@@ -593,21 +413,23 @@ body {
 
 <script>
 
-/* =========================================================
-   WEBTUTU BENCHMARK
-   ========================================================= */
+/* =========================
+   WEBTUTU
+========================= */
+
+"use strict";
 
 
-/* ---------- ELEMENTS ---------- */
+/* ELEMENTS */
 
 const startButton =
-    document.getElementById("startButton");
+    document.getElementById("start");
 
-const currentTest =
-    document.getElementById("currentTest");
+const current =
+    document.getElementById("current");
 
-const testDescription =
-    document.getElementById("testDescription");
+const description =
+    document.getElementById("description");
 
 const progressBar =
     document.getElementById("progressBar");
@@ -615,55 +437,67 @@ const progressBar =
 const progressText =
     document.getElementById("progressText");
 
-const totalScore =
-    document.getElementById("totalScore");
+const total =
+    document.getElementById("total");
 
-const scoreRing =
-    document.getElementById("scoreRing");
+const errorBox =
+    document.getElementById("error");
 
-const results =
-    document.getElementById("results");
+const scoreBox =
+    document.getElementById("scoreBox");
 
 
-/* ---------- DEVICE INFO ---------- */
+/* DEVICE */
 
-function getDeviceInfo() {
+document.getElementById("device").textContent =
+    "CPU-потоки: " +
+    (navigator.hardwareConcurrency || "?") +
+    " · Экран: " +
+    screen.width +
+    "×" +
+    screen.height;
 
-    const cores =
-        navigator.hardwareConcurrency || "неизвестно";
 
-    const memory =
-        navigator.deviceMemory
-        ? navigator.deviceMemory + " GB"
-        : "неизвестно";
+/* PROGRESS */
 
-    const screenInfo =
-        window.screen.width +
-        " × " +
-        window.screen.height;
+function progress(value) {
 
-    document.getElementById("deviceInfo").innerHTML =
-        "Потоки CPU: " + cores +
-        " · RAM браузера: " + memory +
-        " · Экран: " + screenInfo;
+    progressBar.style.width =
+        value + "%";
+
+    progressText.textContent =
+        Math.round(value) + "%";
 
 }
 
-getDeviceInfo();
+
+/* TEST NAME */
+
+function status(name, text) {
+
+    current.textContent = name;
+
+    description.textContent = text;
+
+}
 
 
-/* ---------- HELPERS ---------- */
+/* WAIT */
 
-function sleep(ms) {
+function wait(ms) {
 
-    return new Promise(resolve => {
+    return new Promise(function(resolve) {
+
         setTimeout(resolve, ms);
+
     });
 
 }
 
 
-function clamp(value, min, max) {
+/* LIMIT */
+
+function limit(value, min, max) {
 
     return Math.max(
         min,
@@ -673,152 +507,92 @@ function clamp(value, min, max) {
 }
 
 
-function setProgress(value) {
+/* FORMAT */
 
-    value = clamp(value, 0, 100);
+function format(number) {
 
-    progressBar.style.width =
-        value + "%";
-
-    progressText.innerText =
-        Math.round(value) + "%";
+    return Math.round(number)
+        .toLocaleString("ru-RU");
 
 }
 
 
-function setTest(name, description) {
+/* =========================
+   CPU
+========================= */
 
-    currentTest.innerText = name;
+async function testCPU() {
 
-    testDescription.innerText =
-        description;
-
-}
-
-
-/* =========================================================
-   CPU BENCHMARK
-   ========================================================= */
-
-async function cpuTest() {
-
-    setTest(
+    status(
         "Тест CPU...",
         "Выполняются математические вычисления"
     );
 
-    await sleep(300);
+    await wait(300);
 
     let totalTime = 0;
 
-    let finalValue = 0;
-
-
-    /*
-       Несколько проходов делают результат
-       более стабильным.
-    */
-
-    for (let round = 0; round < 3; round++) {
+    for (
+        let round = 0;
+        round < 3;
+        round++
+    ) {
 
         const start =
             performance.now();
 
-        let x = 0;
-
-        /*
-           Основная нагрузка.
-        */
+        let result = 0;
 
         for (
             let i = 0;
-            i < 3500000;
+            i < 2500000;
             i++
         ) {
 
-            x +=
+            result +=
                 Math.sqrt(i) *
-                Math.sin(i) *
-                Math.cos(i);
+                Math.sin(i);
 
         }
-
-
-        /*
-           Дополнительная нагрузка
-           на целочисленные операции.
-        */
-
-        let n = 123456789;
-
-        for (
-            let i = 0;
-            i < 1000000;
-            i++
-        ) {
-
-            n =
-                (n * 1664525 + 1013904223)
-                >>> 0;
-
-        }
-
-
-        finalValue +=
-            x + n;
 
         totalTime +=
             performance.now() - start;
 
-
-        setProgress(
+        progress(
             5 + round * 7
         );
 
-        await sleep(80);
+        await wait(50);
 
     }
 
-
-    /*
-       Чем меньше время,
-       тем мощнее CPU.
-    */
-
-    const averageTime =
+    const average =
         totalTime / 3;
 
 
     /*
-       Базовая шкала.
-
-       Быстрые устройства получают
-       больше баллов.
-
-       80 ms  -> около 35000
-       1000 ms -> около 5000
+       Максимум CPU = 35 000
     */
 
     let points =
         35000 *
         Math.pow(
-            80 / Math.max(averageTime, 80),
-            0.65
+            100 / Math.max(average, 100),
+            0.7
         );
 
 
     points =
-        clamp(
+        limit(
             points,
             1000,
             35000
         );
 
 
-    document.getElementById("cpuScore")
-        .innerText =
-        Math.round(points)
-            .toLocaleString("ru-RU");
+    document.getElementById("cpu")
+        .textContent =
+        format(points);
 
 
     return points;
@@ -826,34 +600,31 @@ async function cpuTest() {
 }
 
 
-/* =========================================================
-   GPU / WEBGL BENCHMARK
-   ========================================================= */
+/* =========================
+   GPU
+========================= */
 
-async function gpuTest() {
+async function testGPU() {
 
-    setTest(
+    status(
         "Тест GPU...",
-        "Рендеринг графической нагрузки WebGL"
+        "Рендеринг графики через WebGL"
     );
 
-    await sleep(300);
+    await wait(300);
 
 
     const canvas =
         document.createElement("canvas");
 
-    canvas.width = 720;
-    canvas.height = 480;
+    canvas.width = 600;
+    canvas.height = 400;
 
     canvas.style.position =
         "fixed";
 
     canvas.style.left =
         "-2000px";
-
-    canvas.style.top =
-        "0";
 
     document.body.appendChild(canvas);
 
@@ -863,124 +634,111 @@ async function gpuTest() {
             "webgl",
             {
                 antialias: false,
-                powerPreference: "high-performance"
+                powerPreference:
+                    "high-performance"
             }
         );
 
 
     if (!gl) {
 
-        document.getElementById("gpuScore")
-            .innerText = "0";
-
         canvas.remove();
+
+        document.getElementById("gpu")
+            .textContent = "0";
 
         return 0;
 
     }
 
 
-    /*
-       Простая WebGL-программа.
-    */
-
-    const vertexShaderSource = `
-
+    const vertexSource = `
         attribute vec2 position;
 
         void main() {
-
             gl_Position =
                 vec4(position, 0.0, 1.0);
-
         }
-
     `;
 
 
-    const fragmentShaderSource = `
-
+    const fragmentSource = `
         precision highp float;
 
         uniform float time;
 
         void main() {
 
-            vec2 uv =
+            vec2 p =
                 gl_FragCoord.xy /
-                vec2(720.0, 480.0);
+                vec2(600.0, 400.0);
 
-            float v = 0.0;
+            float value = 0.0;
 
-            for(int i = 0; i < 35; i++) {
+            for(int i = 0; i < 20; i++) {
 
-                v +=
+                value +=
                     sin(
-                        uv.x * 12.0 +
-                        float(i) * 0.31 +
+                        p.x * 15.0 +
+                        float(i) +
                         time
                     ) *
                     cos(
-                        uv.y * 14.0 +
-                        float(i) * 0.21
+                        p.y * 15.0 +
+                        float(i)
                     );
 
             }
 
             float r =
                 0.5 +
-                0.5 *
-                sin(v + time);
+                0.5 * sin(value);
 
             float g =
                 0.5 +
-                0.5 *
-                cos(v * 0.8 + time);
+                0.5 * cos(value);
 
             float b =
                 0.5 +
-                0.5 *
-                sin(v * 0.5);
+                0.5 * sin(value * 0.5);
 
             gl_FragColor =
                 vec4(r, g, b, 1.0);
-
         }
-
     `;
 
 
-    function createShader(
+    function shader(
         type,
         source
     ) {
 
-        const shader =
+        const s =
             gl.createShader(type);
 
         gl.shaderSource(
-            shader,
+            s,
             source
         );
 
-        gl.compileShader(shader);
+        gl.compileShader(s);
 
-        return shader;
+        return s;
 
     }
 
 
-    const vertexShader =
-        createShader(
+    const vs =
+        shader(
             gl.VERTEX_SHADER,
-            vertexShaderSource
+            vertexSource
         );
 
 
-    const fragmentShader =
-        createShader(
+    const fs =
+        shader(
             gl.FRAGMENT_SHADER,
-            fragmentShaderSource
+            fragmentSource
         );
 
 
@@ -989,22 +747,18 @@ async function gpuTest() {
 
     gl.attachShader(
         program,
-        vertexShader
+        vs
     );
 
     gl.attachShader(
         program,
-        fragmentShader
+        fs
     );
 
     gl.linkProgram(program);
 
     gl.useProgram(program);
 
-
-    /*
-       Полноэкранный квадрат.
-    */
 
     const buffer =
         gl.createBuffer();
@@ -1015,7 +769,9 @@ async function gpuTest() {
     );
 
 
-    const vertices =
+    gl.bufferData(
+        gl.ARRAY_BUFFER,
+
         new Float32Array([
 
             -1, -1,
@@ -1026,12 +782,8 @@ async function gpuTest() {
              1, -1,
              1,  1
 
-        ]);
+        ]),
 
-
-    gl.bufferData(
-        gl.ARRAY_BUFFER,
-        vertices,
         gl.STATIC_DRAW
     );
 
@@ -1065,16 +817,12 @@ async function gpuTest() {
         );
 
 
-    /*
-       GPU тест.
-    */
+    const start =
+        performance.now();
 
     let frames = 0;
 
-    const duration = 5000;
-
-    const start =
-        performance.now();
+    const duration = 4000;
 
 
     while (
@@ -1082,24 +830,25 @@ async function gpuTest() {
         < duration
     ) {
 
-        const now =
-            performance.now();
+        const time =
+            performance.now() / 1000;
+
 
         gl.uniform1f(
             timeLocation,
-            now / 1000
+            time
         );
 
 
         /*
-           Несколько проходов рендера
-           на каждый кадр.
+           Несколько рендеров
+           для большей нагрузки.
         */
 
         for (
-            let pass = 0;
-            pass < 3;
-            pass++
+            let i = 0;
+            i < 3;
+            i++
         ) {
 
             gl.drawArrays(
@@ -1111,31 +860,31 @@ async function gpuTest() {
         }
 
 
-        gl.finish();
-
         frames++;
 
 
         const elapsed =
-            now - start;
+            performance.now() - start;
 
 
-        setProgress(
+        progress(
             25 +
-            (elapsed / duration) * 25
+            elapsed / duration * 25
         );
 
 
-        /*
-           Иногда отдаём управление браузеру,
-           чтобы интерфейс не зависал.
-        */
-
-        if (frames % 5 === 0) {
+        if (
+            frames % 5 === 0
+        ) {
 
             await new Promise(
-                resolve =>
-                    requestAnimationFrame(resolve)
+                function(resolve) {
+
+                    requestAnimationFrame(
+                        resolve
+                    );
+
+                }
             );
 
         }
@@ -1144,46 +893,30 @@ async function gpuTest() {
 
 
     const fps =
-        frames / (duration / 1000);
+        frames / 4;
 
 
     /*
-       Примерная шкала GPU.
-
-       20 FPS  -> слабое устройство
-       240 FPS -> очень мощное
+       GPU = максимум 30 000
     */
 
     let points =
-        30000 *
-        clamp(
-            Math.pow(
-                fps / 20,
-                0.72
-            ) / 4.2,
-            0.05,
-            1
-        );
+        (fps - 10) /
+        (180 - 10) *
+        30000;
 
-
-    /*
-       Более понятная нормализация.
-    */
 
     points =
-        clamp(
-            (fps - 10) /
-            (180 - 10) *
-            30000,
+        limit(
+            points,
             1000,
             30000
         );
 
 
-    document.getElementById("gpuScore")
-        .innerText =
-        Math.round(points)
-            .toLocaleString("ru-RU");
+    document.getElementById("gpu")
+        .textContent =
+        format(points);
 
 
     canvas.remove();
@@ -1193,19 +926,18 @@ async function gpuTest() {
 }
 
 
-/* =========================================================
-   RAM BENCHMARK
-   ========================================================= */
+/* =========================
+   RAM
+========================= */
 
-async function ramTest() {
+async function testRAM() {
 
-    setTest(
+    status(
         "Тест RAM...",
-        "Чтение и запись больших массивов памяти"
+        "Чтение и запись данных"
     );
 
-    await sleep(300);
-
+    await wait(300);
 
     let totalTime = 0;
 
@@ -1220,42 +952,365 @@ async function ramTest() {
             performance.now();
 
 
-        /*
-           TypedArray позволяет сделать
-           достаточно предсказуемый тест.
-        */
-
-        const size =
-            1500000;
-
         const array =
-            new Float64Array(size);
+            new Float64Array(
+                1000000
+            );
 
-
-        /*
-           Запись.
-        */
 
         for (
             let i = 0;
-            i < size;
+            i < array.length;
             i++
         ) {
 
             array[i] =
-                i * 0.123456;
+                i * 0.123;
 
         }
 
 
-        /*
-           Чтение.
-        */
-
         let sum = 0;
+
 
         for (
             let i = 0;
-            i < size;
+            i < array.length;
             i += 4
-       
+        ) {
+
+            sum +=
+                array[i];
+
+        }
+
+
+        totalTime +=
+            performance.now() - start;
+
+
+        progress(
+            50 + round * 6
+        );
+
+
+        await wait(50);
+
+    }
+
+
+    const average =
+        totalTime / 3;
+
+
+    /*
+       RAM = максимум 20 000
+    */
+
+    let points =
+        20000 *
+        Math.pow(
+            80 / Math.max(average, 80),
+            0.65
+        );
+
+
+    points =
+        limit(
+            points,
+            1000,
+            20000
+        );
+
+
+    document.getElementById("ram")
+        .textContent =
+        format(points);
+
+
+    return points;
+
+}
+
+
+/* =========================
+   JAVASCRIPT
+========================= */
+
+async function testJS() {
+
+    status(
+        "Тест JavaScript...",
+        "Массивы, объекты и сортировка"
+    );
+
+    await wait(300);
+
+    let totalTime = 0;
+
+
+    for (
+        let round = 0;
+        round < 3;
+        round++
+    ) {
+
+        const start =
+            performance.now();
+
+
+        const array = [];
+
+
+        for (
+            let i = 0;
+            i < 120000;
+            i++
+        ) {
+
+            array.push({
+
+                id: i,
+
+                value:
+                    Math.random() *
+                    Math.sin(i)
+
+            });
+
+        }
+
+
+        array.sort(
+            function(a, b) {
+
+                return a.value -
+                       b.value;
+
+            }
+        );
+
+
+        let sum = 0;
+
+
+        for (
+            let i = 0;
+            i < array.length;
+            i++
+        ) {
+
+            sum +=
+                array[i].value;
+
+        }
+
+
+        totalTime +=
+            performance.now() - start;
+
+
+        progress(
+            70 + round * 6
+        );
+
+
+        await wait(50);
+
+    }
+
+
+    const average =
+        totalTime / 3;
+
+
+    /*
+       JS = максимум 15 000
+    */
+
+    let points =
+        15000 *
+        Math.pow(
+            100 / Math.max(average, 100),
+            0.7
+        );
+
+
+    points =
+        limit(
+            points,
+            1000,
+            15000
+        );
+
+
+    document.getElementById("js")
+        .textContent =
+        format(points);
+
+
+    return points;
+
+}
+
+
+/* =========================
+   FINAL
+========================= */
+
+function setFinal(score) {
+
+    total.textContent =
+        format(score);
+
+    document.getElementById("final")
+        .textContent =
+        format(score);
+
+
+    const degrees =
+        score / 100000 * 360;
+
+
+    scoreBox.style.background =
+        "conic-gradient(" +
+        "#00e5ff 0deg, " +
+        "#5068ff " +
+        degrees +
+        "deg, " +
+        "#1a202c " +
+        degrees +
+        "deg)";
+
+}
+
+
+/* =========================
+   MAIN
+========================= */
+
+async function benchmark() {
+
+    errorBox.style.display =
+        "none";
+
+
+    startButton.disabled =
+        true;
+
+    startButton.textContent =
+        "ТЕСТИРОВАНИЕ...";
+
+
+    total.textContent =
+        "...";
+
+
+    progress(0);
+
+
+    try {
+
+        const cpu =
+            await testCPU();
+
+
+        const gpu =
+            await testGPU();
+
+
+        const ram =
+            await testRAM();
+
+
+        const js =
+            await testJS();
+
+
+        status(
+            "Расчёт результата...",
+            "Почти готово"
+        );
+
+
+        progress(95);
+
+        await wait(700);
+
+
+        const final =
+            Math.round(
+                cpu +
+                gpu +
+                ram +
+                js
+            );
+
+
+        setFinal(final);
+
+
+        progress(100);
+
+
+        status(
+            "Тест завершён",
+            "Все тесты успешно выполнены"
+        );
+
+
+        startButton.textContent =
+            "ПОВТОРИТЬ ТЕСТ";
+
+
+    }
+
+    catch (error) {
+
+        console.error(error);
+
+
+        errorBox.style.display =
+            "block";
+
+        errorBox.textContent =
+            "Ошибка теста: " +
+            error.message;
+
+
+        status(
+            "Произошла ошибка",
+            "Попробуй обновить страницу"
+        );
+
+
+        startButton.textContent =
+            "ПОВТОРИТЬ ТЕСТ";
+
+    }
+
+
+    startButton.disabled =
+        false;
+
+}
+
+
+/* =========================
+   BUTTON
+========================= */
+
+/*
+   Именно здесь создаётся
+   обработчик кнопки.
+*/
+
+startButton.addEventListener(
+    "click",
+    benchmark
+);
+
+</script>
+
+</body>
+</html>
